@@ -1,5 +1,5 @@
 import { request, response, Router } from 'express';
-import { Any, Equal, getCustomRepository, In, Like } from 'typeorm';
+import { getCustomRepository } from 'typeorm';
 import ToolsRepository from '../repositories/ToolsRepository';
 
 import createToolsService from '../services/CreateToolsService';
