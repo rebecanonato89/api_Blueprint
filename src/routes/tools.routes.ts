@@ -1,13 +1,36 @@
 import { request, response, Router } from 'express';
+import { Any, Equal, getCustomRepository, In, Like } from 'typeorm';
+import ToolsRepository from '../repositories/ToolsRepository';
 
 import createToolsService from '../services/CreateToolsService';
 
 const toolsRouter = Router();
 
-toolsRouter.get('/', (request, response) => {
-    return response.json('requisição realizada com sucesso');
-});
+toolsRouter.get('/', async (request, response) => {
 
+    try {
+        const toolsRepository = getCustomRepository(ToolsRepository);
+        const { tag }: any = request.query;
+
+        if (tag != undefined) {
+            console.log(tag);
+
+
+            const tools = await toolsRepository.createQueryBuilder("tools")
+                .where("tools.tags like :tag", { tag: `%${tag}%` })
+                .getMany();
+
+            return response.json(tools);
+        }
+
+
+        const tools = await toolsRepository.find();
+        return response.json(tools);
+    }
+    catch (err) {
+        return response.status(400).json({ error: err.message });
+    }
+});
 
 toolsRouter.post('/', async (request, response) => {
     try {
@@ -19,7 +42,7 @@ toolsRouter.post('/', async (request, response) => {
             title, link, description, tags
         });
 
-        return response.json(tools);
+        return response.status(201).json(tools);
     }
     catch (err) {
         return response.status(400).json({ error: err.message });
