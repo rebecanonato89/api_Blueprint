@@ -49,5 +49,34 @@ toolsRouter.post('/', async (request, response) => {
     }
 });
 
+toolsRouter.delete('/:id', async (request, response) => {
+    try {
+        const { id } = request.params;
+
+        const toolsRepository = getCustomRepository(ToolsRepository);
+
+        const exist = await toolsRepository.findOne(id);
+
+        console.log(exist);
+
+        if (exist == undefined) {
+            return response.status(200).json({ error: "id não existe." });
+        }
+
+        console.log(exist);
+        await toolsRepository
+            .createQueryBuilder()
+            .delete()
+            .from("tools")
+            .where("id = :id", { id: id })
+            .execute();
+
+        return response.status(204).json({ error: "deletado com sucesso." });
+    }
+    catch (err) {
+        return response.status(400).json({ error: err.message });
+    }
+});
+
 
 export default toolsRouter;
